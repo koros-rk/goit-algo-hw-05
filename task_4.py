@@ -9,8 +9,10 @@ def input_error(function: Callable):
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
-        except ValueError or IndexError or KeyError:
+        except ValueError or IndexError:
             return "Enter the argument for the command"
+        except KeyError:
+            return "Person not found."
 
     return wrapper
 
@@ -32,20 +34,16 @@ def add(args, repository: dict):
 @input_error
 def change(args, repository: dict):
     name, phone = args
-    if name in repository:
+    if repository[name]:
         repository.update({name: phone})
         return f"Phone number for {name} changed."
-    else:
-        return "Person not found."
+    return None
 
 
 @input_error
 def phone(args, repository: dict):
     (name,) = args
-    if name in repository:
-        return repository.get(name)
-    else:
-        return "Person not found."
+    return repository[name]
 
 
 @input_error
@@ -87,7 +85,13 @@ def main():
     print("Welcome to the assistant bot!")
 
     while True:
-        command, *args = input("Enter a command: ").split()
+        args_array = input("Enter a command: ").split()
+
+        if len(args_array) < 1:
+            print("Invalid argument provided.")
+            continue
+
+        command, *args = args_array
         command_handler = get_handler(command)
 
         if command in ["exit", "quit"]:

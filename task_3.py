@@ -1,5 +1,4 @@
 import argparse
-import sys
 from collections import namedtuple
 
 from rich.console import Console
